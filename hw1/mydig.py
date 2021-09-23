@@ -38,9 +38,9 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
     # 3. issue request to Name Server
     prev_resp = tld_resp
     while not check_ans(cur_type, prev_resp):
-        if len(prev_resp.answer) != 0:      # answer is returned but CNAME only
+        if len(prev_resp.answer) != 0:      # answer is returned but contains only CNAME
             result_list.append(prev_resp.answer)    # add current answer to result_list
-            if cur_type == dns.rdatatype.A:         # resolve CNAME
+            if cur_type == dns.rdatatype.A:         # resolve CNAME, only when query_type is A, otherwise return answer.
                 dns_resolver(get_cname(prev_resp.answer), cur_type, result_list)
             return
 
