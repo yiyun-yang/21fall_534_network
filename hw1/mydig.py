@@ -44,17 +44,22 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
                 dns_resolver(get_cname(prev_resp.answer), cur_type, result_list)
             return
 
-        ns_ipv4_list = to_ipv4_list(prev_resp.additional)   # answer is empty
-        prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)   # go to next query by additional info
+        if len(prev_resp.additional) > 0:   # answer is empty, query by additional info
+            ns_ipv4_list = to_ipv4_list(prev_resp.additional)
+            prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
+        else:
+            ns_result_list = []              # additional is empty, query by authoritative server
+            dns_resolver(get_authoritative(prev_resp.authority), dns.rdatatype.A, ns_result_list)
+            ns_ipv4_list = to_ipv4_list(ns_result_list[-1])
+            prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
+
     result_list.append(prev_resp.answer)
 
 
 def issue_request(ipv4_list, query_type, query_domain):
     for ip in ipv4_list:
         try:
-            resp = single_query(query_domain, query_type, ip)
-            if resp.rcode() == dns.rcode.NOERROR:
-                return resp
+            return single_query(query_domain, query_type, ip)
         except Exception as e:
             print(f'query server {ip} type {dns.rdatatype.to_text(query_type)} failed: {e}')
     print(f'Request for all Servers failed')
@@ -74,6 +79,11 @@ def get_cname(rr_set_list):
     for rr_set in rr_set_list:
         if rr_set.rdtype == dns.rdatatype.CNAME:
             return get_rdata(rr_set)
+
+
+def get_authoritative(rr_set_list):
+    for rr_set in rr_set_list:
+        return get_rdata(rr_set)
 
 
 def to_ipv4_list(rr_set_list):
