@@ -39,13 +39,13 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
     prev_resp = tld_resp
     while not check_ans(cur_type, prev_resp):
         if len(prev_resp.answer) != 0:      # answer is returned but CNAME only
-            result_list.append(prev_resp.answer)
-            if cur_type == dns.rdatatype.A:
+            result_list.append(prev_resp.answer)    # add current answer to result_list
+            if cur_type == dns.rdatatype.A:         # resolve CNAME
                 dns_resolver(get_cname(prev_resp.answer), cur_type, result_list)
             return
 
         ns_ipv4_list = to_ipv4_list(prev_resp.additional)   # answer is empty
-        prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
+        prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)   # go to next query by additional info
     result_list.append(prev_resp.answer)
 
 
