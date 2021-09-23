@@ -15,7 +15,7 @@ import dns.rdatatype
 import random
 
 
-def dns_resolver(cur_domain, cur_type: dns.rdatatype):
+def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
     # this list is copied from www.iana.org/domains/root/servers
     root_server_list = ['198.41.0.4', '199.9.14.201', '192.33.4.12', '199.7.91.13', '192.203.230.10', '192.5.5.241',
                         '192.112.36.4', '198.97.190.53', '192.36.148.17', '192.58.128.30', '193.0.14.129',
@@ -39,11 +39,14 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype):
     prev_resp = tld_resp
     while not check_ans(cur_type, prev_resp):
         if len(prev_resp.answer) != 0:      # answer is returned but CNAME only
-            return prev_resp.answer
+            result_list.append(prev_resp.answer)
+            if cur_type == dns.rdatatype.A:
+                dns_resolver(get_cname(prev_resp.answer), cur_type, result_list)
+            return
 
         ns_ipv4_list = to_ipv4_list(prev_resp.additional)   # answer is empty
         prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
-    return prev_resp.answer
+    result_list.append(prev_resp.answer)
 
 
 def issue_request(ipv4_list, query_type, query_domain):
@@ -67,6 +70,12 @@ def get_rdata(rr_set: dns.rrset.RRset):
         return item.to_text()
 
 
+def get_cname(rr_set_list):
+    for rr_set in rr_set_list:
+        if rr_set.rdtype == dns.rdatatype.CNAME:
+            return get_rdata(rr_set)
+
+
 def to_ipv4_list(rr_set_list):
     return [get_rdata(x) for x in rr_set_list if x.rdtype == dns.rdatatype.A]
 
@@ -82,17 +91,19 @@ def main():
     query_domain = sys.argv[1]
     rdtype = sys.argv[2]
     start_time = time.time()
-    rr_set_list = dns_resolver(query_domain, dns.rdatatype.from_text(rdtype))
+    result_list = []
+    dns_resolver(query_domain, dns.rdatatype.from_text(rdtype), result_list)
     end_time = time.time()
 
     output = [f'QUESTION SECTION:\n{query_domain}			IN	{rdtype}\n', "ANSWER SECTION: "]
-    for rr_set in rr_set_list:
-        cur_name = rr_set.name
-        cur_class = dns.rdataclass.to_text(rr_set.rdclass)
-        cur_type = dns.rdatatype.to_text(rr_set.rdtype)
-        for ans in rr_set.items.keys():
-            output.append(
-                f"{cur_name} {cur_class} {cur_type} {ans.to_text()}")
+    for result in result_list:
+        for rr_set in result:
+            cur_name = rr_set.name
+            cur_class = dns.rdataclass.to_text(rr_set.rdclass)
+            cur_type = dns.rdatatype.to_text(rr_set.rdtype)
+            for ans in rr_set.items.keys():
+                output.append(
+                    f"{cur_name} {cur_class} {cur_type} {ans.to_text()}")
 
     output.append(f'\nQuery time: {int((end_time - start_time) * 1000)} msec')
     output.append(f'WHEN: {time.asctime(time.localtime(end_time))}\n')
