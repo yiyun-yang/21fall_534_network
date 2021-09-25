@@ -59,15 +59,11 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
 def issue_request(ipv4_list, query_type, query_domain):
     for ip in ipv4_list:
         try:
-            return single_query(query_domain, query_type, ip)
+            req = dns.message.make_query(query_domain, query_type)
+            return dns.query.udp(req, ip, timeout=20)
         except Exception as e:
             print(f'query server {ip} type {dns.rdatatype.to_text(query_type)} failed: {e}')
     print(f'Request for all Servers failed')
-
-
-def single_query(query_domain, query_type: dns.rdatatype, dst_ip, timeout=20):
-    req = dns.message.make_query(query_domain, query_type)
-    return dns.query.udp(req, dst_ip, timeout)
 
 
 def get_rdata(rr_set: dns.rrset.RRset):
