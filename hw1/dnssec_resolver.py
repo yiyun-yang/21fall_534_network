@@ -111,7 +111,7 @@ def verify_zone(rr_set_list, previous_ds_list, key_dict):
                     cur_ds = dns.dnssec.make_ds(rr_set.name, item, prev_ds.digest_type)
                     if cur_ds.to_text() == prev_ds.to_text():        # compare it with the previous DS
                         key_dict[rr_set.name] = rr_set  # name key pair is then put to the dict after verification
-                        return rr_set.name, rr_set
+                        return
     raise Exception("Zone verification failed. ")
 
 
