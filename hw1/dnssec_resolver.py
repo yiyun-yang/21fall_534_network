@@ -97,8 +97,8 @@ def issue_dnssec_request(ipv4_list, query_type, query_domain, condition=lambda x
             if condition(res):
                 return ip, res
         except Exception as e:
-            print(f'query server {ip} type {dns.rdatatype.to_text(query_type)} failed: {e}')
-    raise Exception(f'Request for all Servers failed')
+            print(f'query ip {ip} domain {query_domain} type {dns.rdatatype.to_text(query_type)} failed: {e}')
+    raise Exception(f'Request {query_domain} for all Servers failed')
 
 
 def verify_zone(rr_set_list, previous_ds_list, key_dict):

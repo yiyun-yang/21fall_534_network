@@ -55,10 +55,10 @@ def issue_request(ipv4_list, query_type, query_domain):
     for ip in ipv4_list:
         try:
             req = dns.message.make_query(query_domain, query_type)
-            return dns.query.udp(req, ip, timeout=20)
+            return dns.query.udp(req, ip, timeout=1)
         except Exception as e:
-            print(f'query server {ip} type {dns.rdatatype.to_text(query_type)} failed: {e}')
-    raise Exception(f'Request for all Servers failed')
+            print(f'query ip {ip} domain {query_domain} type {dns.rdatatype.to_text(query_type)} failed: {e}')
+    raise Exception(f'Request {query_domain} for all Servers failed')
 
 
 def an_item_to_text(rr_set: dns.rrset.RRset):
