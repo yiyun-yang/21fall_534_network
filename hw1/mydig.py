@@ -61,7 +61,7 @@ def issue_request(ipv4_list, query_type, query_domain):
     raise Exception(f'Request for all Servers failed')
 
 
-def get_rdata(rr_set: dns.rrset.RRset):
+def an_item_to_text(rr_set: dns.rrset.RRset):
     for item in rr_set.items:
         return item.to_text()
 
@@ -69,16 +69,16 @@ def get_rdata(rr_set: dns.rrset.RRset):
 def get_cname(rr_set_list):
     for rr_set in rr_set_list:
         if rr_set.rdtype == dns.rdatatype.CNAME:
-            return get_rdata(rr_set)
+            return an_item_to_text(rr_set)
 
 
 def get_authoritative(rr_set_list):
     for rr_set in rr_set_list:
-        return get_rdata(rr_set)
+        return an_item_to_text(rr_set)
 
 
 def to_ipv4_list(rr_set_list):
-    return [get_rdata(x) for x in rr_set_list if x.rdtype == dns.rdatatype.A]
+    return [an_item_to_text(x) for x in rr_set_list if x.rdtype == dns.rdatatype.A]
 
 
 def check_ans(query_type: dns.rdatatype, resp):
