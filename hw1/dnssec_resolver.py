@@ -64,6 +64,14 @@ def sec_resolver(cur_domain, cur_type: dns.rdatatype, result_list, key_dict):
             _, prev_resp = issue_dnssec_request(ns_ipv4_list, cur_type, cur_domain)
         else:
             ns_result_list = []  # additional is empty, query by authoritative server
+            authority_domain = get_authority_domain(prev_resp)
+            if authority_domain is None:
+                return
+            sec_resolver(authority_domain, dns.rdatatype.A, ns_result_list)
+            ns_ipv4_list = to_ipv4_list(ns_result_list[-1])
+            prev_resp = issue_dnssec_request(ns_ipv4_list, cur_type, cur_domain)
+
+            ns_result_list = []  # additional is empty, query by authoritative server
             sec_resolver(get_authority_ip(prev_resp), dns.rdatatype.A, ns_result_list, key_dict)
             ns_ipv4_list = to_ipv4_list(ns_result_list[-1])
             authenticate(prev_resp, ns_ipv4_list, key_dict)     # dnssec verification
@@ -138,9 +146,10 @@ def get_cname(rr_set_list):
             return an_item_to_text(rr_set)
 
 
-def get_authority_ip(resp: dns.message.Message):
+def get_authority_domain(resp: dns.message.Message):
     for rr_set in resp.authority:
-        return an_item_to_text(rr_set)
+        if rr_set.rdtype == dns.rdatatype.NS or rr_set.rdtype == dns.rdatatype.CNAME:
+            return an_item_to_text(rr_set)
 
 
 def get_authority_name(resp: dns.message.Message):

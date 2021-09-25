@@ -35,8 +35,7 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
     while not check_ans(cur_type, prev_resp):
         if len(prev_resp.answer) != 0:      # answer is returned but contains only CNAME
             result_list.append(prev_resp.answer)    # add current answer to result_list
-            if cur_type == dns.rdatatype.A:         # resolve CNAME, only when query_type is A, otherwise return answer.
-                dns_resolver(get_cname(prev_resp.answer), cur_type, result_list)
+            dns_resolver(get_cname(prev_resp.answer), cur_type, result_list)
             return
 
         if len(prev_resp.additional) > 0:   # answer is empty, query by additional info
@@ -44,7 +43,10 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
             prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
         else:
             ns_result_list = []              # additional is empty, query by authoritative server
-            dns_resolver(get_authority_ip(prev_resp), dns.rdatatype.A, ns_result_list)
+            authority_domain = get_authority_domain(prev_resp)
+            if authority_domain is None:
+                return
+            dns_resolver(authority_domain, dns.rdatatype.A, ns_result_list)
             ns_ipv4_list = to_ipv4_list(ns_result_list[-1])
             prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
 
@@ -72,9 +74,10 @@ def get_cname(rr_set_list):
             return an_item_to_text(rr_set)
 
 
-def get_authority_ip(resp: dns.message.Message):
+def get_authority_domain(resp: dns.message.Message):
     for rr_set in resp.authority:
-        return an_item_to_text(rr_set)
+        if rr_set.rdtype == dns.rdatatype.NS or rr_set.rdtype == dns.rdatatype.CNAME:
+            return an_item_to_text(rr_set)
 
 
 def to_ipv4_list(rr_set_list):
