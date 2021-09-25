@@ -1,0 +1,81 @@
+1. mydig.py www.cs.stonybrook.edu A
+QUESTION SECTION:
+www.cs.stonybrook.edu			IN	A
+
+ANSWER SECTION: 
+www.cs.stonybrook.edu. IN CNAME live-compscisbu.pantheonsite.io.
+live-compscisbu.pantheonsite.io. IN CNAME fe2.edge.pantheon.io.
+fe2.edge.pantheon.io. IN A 23.185.0.2
+
+Query time: 1802 msec
+WHEN: Sat Sep 25 08:48:34 2021
+
+MSG SIZE rcvd: 280
+
+
+
+2. mydig.py cs.stonybrook.edu MX
+QUESTION SECTION:
+cs.stonybrook.edu			IN	MX
+
+ANSWER SECTION: 
+cs.stonybrook.edu. IN MX 5 alt2.aspmx.l.google.com.
+cs.stonybrook.edu. IN MX 5 alt1.aspmx.l.google.com.
+cs.stonybrook.edu. IN MX 2 aspmx.l.google.com.
+cs.stonybrook.edu. IN MX 10 aspmx3.googlemail.com.
+cs.stonybrook.edu. IN MX 10 aspmx2.googlemail.com.
+
+Query time: 124 msec
+WHEN: Sat Sep 25 08:50:07 2021
+
+MSG SIZE rcvd: 360
+
+
+
+3. mydig.py cs.stonybrook.edu NS
+QUESTION SECTION:
+cs.stonybrook.edu			IN	NS
+
+ANSWER SECTION: 
+cs.stonybrook.edu. IN NS whoisthere.stonybrook.edu.
+cs.stonybrook.edu. IN NS nocnoc.stonybrook.edu.
+cs.stonybrook.edu. IN NS mewho.stonybrook.edu.
+
+Query time: 420 msec
+WHEN: Sat Sep 25 08:50:32 2021
+
+MSG SIZE rcvd: 256
+
+
+
+4. mydig.py www.cnn.com A
+QUESTION SECTION:
+www.cnn.com			IN	A
+
+ANSWER SECTION: 
+www.cnn.com. IN CNAME turner-tls.map.fastly.net.
+turner-tls.map.fastly.net. IN A 151.101.209.67
+
+Query time: 292 msec
+WHEN: Sat Sep 25 08:51:05 2021
+
+MSG SIZE rcvd: 199
+
+
+
+5. mydig.py www.amazon.com NS
+QUESTION SECTION:
+www.amazon.com			IN	NS
+
+ANSWER SECTION: 
+www.amazon.com. IN CNAME tp.47cf2c8c9-frontier.amazon.com.
+tp.47cf2c8c9-frontier.amazon.com. IN CNAME d3ag4hukkh62yn.cloudfront.net.
+d3ag4hukkh62yn.cloudfront.net. IN NS ns-1144.awsdns-15.org.
+d3ag4hukkh62yn.cloudfront.net. IN NS ns-130.awsdns-16.com.
+d3ag4hukkh62yn.cloudfront.net. IN NS ns-2021.awsdns-60.co.uk.
+d3ag4hukkh62yn.cloudfront.net. IN NS ns-824.awsdns-39.net.
+
+Query time: 1707 msec
+WHEN: Sat Sep 25 08:55:07 2021
+
+MSG SIZE rcvd: 477
