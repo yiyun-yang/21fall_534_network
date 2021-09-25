@@ -44,7 +44,7 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
             prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
         else:
             ns_result_list = []              # additional is empty, query by authoritative server
-            dns_resolver(get_authoritative_ip(prev_resp.authority), dns.rdatatype.A, ns_result_list)
+            dns_resolver(get_authoritative_ip(prev_resp), dns.rdatatype.A, ns_result_list)
             ns_ipv4_list = to_ipv4_list(ns_result_list[-1])
             prev_resp = issue_request(ns_ipv4_list, cur_type, cur_domain)
 
@@ -72,8 +72,8 @@ def get_cname(rr_set_list):
             return an_item_to_text(rr_set)
 
 
-def get_authoritative_ip(rr_set_list):
-    for rr_set in rr_set_list:
+def get_authoritative_ip(resp: dns.message.Message):
+    for rr_set in resp.authority:
         return an_item_to_text(rr_set)
 
 
