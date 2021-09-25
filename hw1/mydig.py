@@ -26,16 +26,9 @@ def dns_resolver(cur_domain, cur_type: dns.rdatatype, result_list):
 
     # 1. issue request to root server
     root_resp = issue_request(root_server_list, cur_type, cur_domain)
-    if root_resp is None:
-        print(f'Request for all root servers failed')
-        return
-
     # 2. issue request to TLD
     tld_ip_list = to_ipv4_list(root_resp.additional)
     tld_resp = issue_request(tld_ip_list, cur_type, cur_domain)
-    if tld_resp is None:
-        print(f'Request for all TLD servers failed')
-        return
 
     # 3. issue request to Name Server
     prev_resp = tld_resp
@@ -65,7 +58,7 @@ def issue_request(ipv4_list, query_type, query_domain):
             return dns.query.udp(req, ip, timeout=20)
         except Exception as e:
             print(f'query server {ip} type {dns.rdatatype.to_text(query_type)} failed: {e}')
-    print(f'Request for all Servers failed')
+    raise Exception(f'Request for all Servers failed')
 
 
 def get_rdata(rr_set: dns.rrset.RRset):
