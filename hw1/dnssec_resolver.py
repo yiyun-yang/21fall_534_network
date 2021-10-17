@@ -15,7 +15,12 @@ import dns.rdatatype
 import dns.dnssec
 import random
 from dns.rrset import RRset
-import cryptography
+
+
+class DNSSec_Exception(Exception):
+    def __init__(self, message="Salary is not in (5000, 15000) range"):
+        self.message = message
+        super().__init__(self.message)
 
 # this list is copied from www.iana.org/domains/root/servers
 root_server_list = ['198.41.0.4', '199.9.14.201', '192.33.4.12', '199.7.91.13', '192.203.230.10', '192.5.5.241',
@@ -78,7 +83,7 @@ def authenticate(prev_resp, next_ip_list, key_dict):
     #   0 check if DS record exist
     prev_ds_list = to_ds_list(prev_resp.authority)
     if len(prev_ds_list) == 0:
-        raise Exception(f'“DNSSEC not supported')
+        raise DNSSec_Exception(f'“DNSSEC not supported')
     #   1 query for sub zone's DNS key
     _, dnskey_resp = issue_dnssec_request(next_ip_list, dns.rdatatype.DNSKEY, get_authority_name(prev_resp),
                                               lambda x: len(x.answer) > 0)
@@ -100,7 +105,7 @@ def issue_dnssec_request(ipv4_list, query_type, query_domain, condition=lambda x
                 return ip, res
         except Exception as e:
             print(f'query ip {ip} domain {query_domain} type {dns.rdatatype.to_text(query_type)} failed: {e}')
-    raise Exception(f'Request {query_domain} for all Servers failed')
+    raise DNSSec_Exception(f'Request {query_domain} for all Servers failed')
 
 
 def verify_zone(rr_set_list, previous_ds_list, key_dict):
@@ -112,7 +117,7 @@ def verify_zone(rr_set_list, previous_ds_list, key_dict):
                     if cur_ds.to_text() == prev_ds.to_text():        # compare it with the previous DS
                         key_dict[rr_set.name] = rr_set  # name key pair is then put to the dict after verification
                         return
-    raise Exception("Zone verification failed. ")
+    raise DNSSec_Exception("Zone verification failed. ")
 
 
 def verify_record(rr_set_list, key_dict):
@@ -198,7 +203,7 @@ def main():
             rcvd += len(o)
             print(o)
         print(f'MSG SIZE rcvd: {rcvd}')
-    except (dns.dnssec.ValidationFailure, dns.dnssec.UnsupportedAlgorithm):
+    except (dns.dnssec.ValidationFailure, dns.dnssec.UnsupportedAlgorithm, DNSSec_Exception):
         print(f'DNSSec verification failed')
     except:
         print(f'DNSSEC not supported')
