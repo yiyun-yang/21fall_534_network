@@ -73,6 +73,12 @@ def run():
     r4.cmd('ifconfig r4-eth2 192.168.34.4/24')
     r4.cmd('route add default gw 192.168.34.3')
 
+    # Add routes
+    r1.cmd("ip route add to 192.168.20.0/24 via 192.168.12.2")
+    r2.cmd("ip route add to 192.168.20.0/24 via 192.168.24.4")
+    r4.cmd("ip route add to 192.168.10.0/24 via 192.168.34.3")
+    r3.cmd("ip route add to 192.168.10.0/24 via 192.168.13.1")
+
     for i in [1, 2, 3, 4]:
         info(f'*** Routing Table on Router r{i}:\n')
         info(net[f'r{i}'].cmd('route') + '\n')
