@@ -77,11 +77,6 @@ def run():
     r3.cmd('route add -net 192.168.20.0/24 gw 192.168.34.43')
 
     for i in ['h1', 'h2', 'r1', 'r2', 'r3', 'r4']:
-        # delete default IP that mininet assigned to the interface xx-eth0
-        for ip in net[f'{i}'].cmd("hostname -I").split(" "):
-            if ip.startswith("10.0.0"):
-                net[f'{i}'].cmd(f"ip addr del {ip}/8 dev {i}-eth0")
-                break
         # print ip config
         info(f'*** IP config on node {i}:\n')
         info(net[f'{i}'].cmd('ip a') + '\n')
