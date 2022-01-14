@@ -88,8 +88,13 @@ def run():
 
     for i in ['r1', 'r2', 'r3', 'r4']:
         info(f'*** Routing Table on Router {i}:\n')
-        # info(net[f'{i}'].cmd('netstat -nr') + '\n')
         info(net[f'{i}'].cmd('route -n') + '\n')
+
+    # print ping output
+    info("*** ping output from h1 to h2\n")
+    info(h1.cmd(f"ping -c2 {h2.cmd('hostname -I')}") + "\n")
+    info("*** ping output from h2 to h1\n")
+    info(h2.cmd(f"ping -c2 {h1.cmd('hostname -I')}") + "\n")
 
     # print traceroute output
     info("*** trace route output from h1 to h2\n")
