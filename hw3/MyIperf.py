@@ -55,10 +55,15 @@ class NetworkTopo(Topo):
         h1 = self.addHost('h1')
         h2 = self.addHost('h2')
 
-        bs = 10000  # buffer size option: 10000, 5000000, 25000000
+        bs_option = 1  # buffer size option: 1: 10000, 2: 5Mb, 3: 25Mb
         if len(sys.argv) > 1:
-            bs = int(sys.argv[1])
-        print(bs)
+            bs_option = int(sys.argv[1])
+        if bs_option == 1:
+            bs = 1000
+        elif bs_option == 2:
+            bs = 5 * 1024 * 1024
+        else:
+            bs = 25 * 1024 * 1024
 
         # Adding host-router connection
         self.addLink(h1, r1, inftname1='h1-eth0', inftname2='r1-eth0', cls=TCLink, bw=100, delay='30ms', max_queue_size=bs)
